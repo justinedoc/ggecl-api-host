@@ -53,6 +53,7 @@ async function init() {
     console.error("Initialization error:", err);
   }
 }
+
 init();
 
 export default app;
