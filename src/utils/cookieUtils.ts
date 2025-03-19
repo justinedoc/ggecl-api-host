@@ -12,6 +12,7 @@ export const setRefreshTokenCookie = (res: Response, token: string) => {
   res.cookie("session", token, {
     maxAge: COOKIE_MAX_AGE,
     ...options,
+    partitioned: true,
   });
 };
 
