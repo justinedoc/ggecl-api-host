@@ -14,6 +14,10 @@ const redis = createClient({
   },
 });
 
+redis.on("error", (err) => {
+  console.error("Redis Client Error:", err);
+});
+
 export async function connectToCache() {
   console.log("⚡ Connecting to redis...");
   try {

@@ -10,6 +10,7 @@ import studentRoutes from "./routes/studentRoutes.js";
 import instructorRoutes from "./routes/instructorRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import verifyEmailRoutes from "./routes/emailVerifyRoutes.js";
+import sessionRoute from "./routes/sessionRoute.js";
 
 // Configs & Middlewares
 // import { envConfig } from "./config/envValidator.js";
@@ -37,6 +38,7 @@ app.use(`${ROUTE_PREFIX}/instructor`, instructorRoutes);
 app.use(`${ROUTE_PREFIX}/course`, courseRoutes);
 app.use(`${ROUTE_PREFIX}`, verifyEmailRoutes);
 app.use(`${ROUTE_PREFIX}/refresh`, refresh);
+app.use(ROUTE_PREFIX, sessionRoute);
 app.use(`${ROUTE_PREFIX}/health-check`, (req, res) => {
   res.send("Server is running!");
 });

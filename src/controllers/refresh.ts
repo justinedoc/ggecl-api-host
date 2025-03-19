@@ -13,18 +13,18 @@ import {
 
 // JWT payload type
 type UserRole = "student" | "instructor";
-interface JwtPayload {
+export interface JwtPayload {
   id: string;
   role: UserRole;
 }
 
 // Define roleMappings with specific model types for each role
-type RoleConfig = {
+export type RoleConfig = {
   student: { model: Model<IStudent> };
   instructor: { model: Model<IInstructor> };
 };
 
-const roleMappings: RoleConfig = {
+export const roleMappings: RoleConfig = {
   student: { model: studentModel },
   instructor: { model: instructorModel },
 };
@@ -52,6 +52,8 @@ const sendErrorResponse = (
 const refresh = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.session;
+
+    console.log(refreshToken);
 
     if (!refreshToken) {
       sendErrorResponse(res, 401, "Authorization token required");
@@ -108,8 +110,10 @@ const refresh = asyncHandler(
       });
 
       // Update refresh token
-      user.refreshToken = newRefreshToken;
-      await user.save();
+
+      await userModel.findByIdAndUpdate(user._id, {
+        refreshToken: newRefreshToken,
+      });
 
       // Set new cookie and response
       setRefreshTokenCookie(res, newRefreshToken);
