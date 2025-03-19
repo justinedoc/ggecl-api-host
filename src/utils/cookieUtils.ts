@@ -5,7 +5,7 @@ import { COOKIE_MAX_AGE } from "../constants/auth.js";
 const options = {
   httpOnly: true,
   secure: envConfig.environment === "PROD",
-  sameSite: envConfig.environment === "PROD" ? "strict" : "lax"
+  sameSite: "none",
 } as const;
 
 export const setRefreshTokenCookie = (res: Response, token: string) => {
