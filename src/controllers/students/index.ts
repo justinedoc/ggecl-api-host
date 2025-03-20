@@ -49,7 +49,7 @@ export const getStudentById = asyncHandler(
     }
 
     try {
-      const student = await Student.findById(id).lean().exec();
+      const student = await Student.findById(id).select("-password").lean().exec();
 
       if (!student) {
         res.status(404).json({ message: "Student not found" });

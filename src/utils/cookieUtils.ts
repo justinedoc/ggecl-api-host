@@ -5,14 +5,14 @@ import { COOKIE_MAX_AGE } from "../constants/auth.js";
 const options = {
   httpOnly: true,
   secure: envConfig.environment === "PROD",
-  sameSite: envConfig.environment === "PROD" ? "none" : "strict",
+  sameSite: envConfig.environment === "PROD" ? "none" : "lax",
   partitioned: envConfig.environment === "PROD",
 } as const;
 
 export const setRefreshTokenCookie = (res: Response, token: string) => {
   res.cookie("session", token, {
     maxAge: COOKIE_MAX_AGE,
-    ...options
+    ...options,
   });
 };
 

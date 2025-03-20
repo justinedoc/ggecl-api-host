@@ -10,10 +10,12 @@ export function authenticator(
 ) {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       message: "Invalid authorization header",
     });
+
+    return;
   }
 
   const token = authHeader.split(" ")[1];
@@ -21,30 +23,37 @@ export function authenticator(
   try {
     const decoded = jwt.verify(token, envConfig.accessToken) as { id?: string };
     if (!decoded?.id) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: "Invalid token payload",
       });
+
+      return;
     }
     req.user = { id: decoded.id };
-    return next();
+    next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: "Token has expired",
       });
+
+      return;
     }
     if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: "Invalid token",
       });
+
+      return;
     }
     console.error("Authentication error:", error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: "Authentication failed",
     });
+    return;
   }
 }

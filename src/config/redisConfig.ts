@@ -5,7 +5,7 @@ import { createClient } from "redis";
 //   url: envConfig.redisUrl,
 // });
 
-const redis = createClient({
+export const redis = createClient({
   username: "default",
   password: "gKPdxuIOJuv9laBQt8YOmKYRWWFS0t2t",
   socket: {
