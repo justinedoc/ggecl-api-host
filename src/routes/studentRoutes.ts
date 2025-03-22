@@ -6,6 +6,7 @@ import {
 } from "../controllers/students/index.js";
 import { authenticator } from "../middlewares/authenticator.js";
 import { handleStudentGoogleAuth } from "../controllers/students/googleAuth.js";
+import { checkObjectId } from "../middlewares/checkObjectId.js";
 
 const router = express.Router();
 
@@ -15,8 +16,8 @@ router.post("/logout", logout);
 
 router.post("/google/auth", handleStudentGoogleAuth);
 
-router.put("/:id", authenticator, updateStudent);
+router.put("/:id", authenticator, checkObjectId, updateStudent);
 
-router.get("/:id", getStudentById);
+router.get("/:id", authenticator, checkObjectId, getStudentById);
 
 export default router;

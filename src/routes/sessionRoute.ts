@@ -51,9 +51,11 @@ router.get("/auth/session", async (req, res) => {
       return;
     }
 
-    await redis.setEx(cacheKey, USER_CACHE_TTL, JSON.stringify(user));
+    const sessionData = { id: user._id, role };
 
-    res.json({ success: true, data: user });
+    await redis.setEx(cacheKey, USER_CACHE_TTL, JSON.stringify(sessionData));
+
+    res.json({ success: true, data: sessionData });
   } catch (error) {
     console.error("Session verification error:", error);
 

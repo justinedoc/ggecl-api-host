@@ -10,9 +10,13 @@ import {
   setRefreshTokenCookie,
   clearRefreshTokenCookie,
 } from "../utils/cookieUtils.js";
+import { redis } from "../config/redisConfig.js";
+
+const REFRESH_CACHE_TTL = 14 * 60; // 14 minutes in seconds
+
+type UserRole = "student" | "instructor";
 
 // JWT payload type
-type UserRole = "student" | "instructor";
 export interface JwtPayload {
   id: string;
   role: UserRole;
@@ -48,7 +52,16 @@ const refresh = asyncHandler(async (req: Request, res: Response) => {
       success: false,
       message: "Refresh token required",
     });
+    return;
+  }
 
+  const cacheKey = `refresh:${refreshToken}`;
+  const cachedData = await redis.get(cacheKey);
+
+  if (cachedData) {
+    const { accessToken, newRefreshToken } = JSON.parse(cachedData);
+    setRefreshTokenCookie(res, newRefreshToken);
+    res.json({ success: true, fromCache: true, token: accessToken });
     return;
   }
 
@@ -85,7 +98,7 @@ const refresh = asyncHandler(async (req: Request, res: Response) => {
   const userModel = roleMappings[role].model as Model<IStudent | IInstructor>;
 
   // Find user with matching refresh token
-  const user = await userModel.findOne({ _id: id, refreshToken });
+  const user = await userModel.findById(id);
   if (!user) {
     clearRefreshTokenCookie(res);
     res.status(401).json({
@@ -106,6 +119,15 @@ const refresh = asyncHandler(async (req: Request, res: Response) => {
     role,
     type: "accessToken",
   });
+
+  const multi = redis.multi();
+  multi.setEx(
+    `refresh:${newRefreshToken}`,
+    REFRESH_CACHE_TTL,
+    JSON.stringify({ accessToken, newRefreshToken })
+  );
+  multi.del(`refresh:${refreshToken}`);
+  await multi.exec();
 
   // Update refresh token in DB
   await userModel.findByIdAndUpdate(user._id, {

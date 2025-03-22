@@ -3,5 +3,4 @@ export const SALT_ROUNDS = 10;
 export const TOKEN_EXPIRY = {
   accessToken: "15m",
   refreshToken: "7d",
-  verifyEmailToken: "10m",
 } as const;

@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import asyncHandler from "express-async-handler";
-import mongoose, { isValidObjectId } from "mongoose";
+import mongoose from "mongoose";
 import Student from "../../models/studentModel.js";
 import NodeCache from "node-cache";
 import { z } from "zod";
@@ -33,23 +33,29 @@ function wildcardDeleteCache(start: string) {
 }
 
 export const getStudentById = asyncHandler(
-  async (req: Request<{ id: string }>, res: Response) => {
+  async (req: AuthenticatedRequest<{ id: string }>, res: Response) => {
     const id = req.params.id;
+    const studentId = req.user.id;
 
-    if (!isValidObjectId(id)) {
-      res.status(400).json({ message: "Invalid student ID" });
-      return;
-    }
-
-    const cachedStudent = cache.get(`student-${id}`);
+    const cachedStudent = cache.get(`student-${studentId}`);
 
     if (cachedStudent) {
       res.json({ success: true, fromCache: true, data: cachedStudent });
       return;
     }
 
+    if (id !== studentId) {
+      res.status(403).json({ message: "Not authorized to view this student" });
+      return;
+    }
+
     try {
-      const student = await Student.findById(id).select("-password").lean().exec();
+      const student = await Student.findById(id)
+        .select(
+          "-password -refreshToken -emailVerificationExpires -emailVerificationToken"
+        )
+        .lean()
+        .exec();
 
       if (!student) {
         res.status(404).json({ message: "Student not found" });
@@ -88,12 +94,6 @@ export const updateStudent = asyncHandler(
     if (id !== studentId) {
       res.status(403);
       throw new Error("Not authorized to update this student");
-    }
-
-    // Validate ID
-    if (!isValidObjectId(id)) {
-      res.status(400);
-      throw new Error("Invalid student ID format");
     }
 
     // Zod validation

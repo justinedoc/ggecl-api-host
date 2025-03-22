@@ -14,7 +14,6 @@ export function authenticator(
       success: false,
       message: "Invalid authorization header",
     });
-
     return;
   }
 
