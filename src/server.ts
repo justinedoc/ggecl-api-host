@@ -17,8 +17,7 @@ import sessionRoute from "./routes/sessionRoute.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { connectToCache } from "./config/redisConfig.js";
 import { connectToDb } from "./config/mongodbConfig.js";
-import { logout } from "./controllers/logout.js";
-
+import logoutRoute from "./routes/logoutRoute.js";
 const app = express();
 
 // Middlewares
@@ -40,7 +39,7 @@ app.use(`${ROUTE_PREFIX}/course`, courseRoutes);
 app.use(`${ROUTE_PREFIX}`, verifyEmailRoutes);
 app.use(`${ROUTE_PREFIX}/refresh`, refresh);
 app.use(ROUTE_PREFIX, sessionRoute);
-app.use(`${ROUTE_PREFIX}/logout`, logout);
+app.use(`${ROUTE_PREFIX}`, logoutRoute);
 app.use(`${ROUTE_PREFIX}/health-check`, (req, res) => {
   res.send("Server is running!");
 });

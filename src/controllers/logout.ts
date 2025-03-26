@@ -17,7 +17,7 @@ export const logout = expressAsyncHandler(
 
     try {
       const { role } = parseJwt(refreshToken);
-      console.log(role);
+      console.log(`${role} is logging out`);
       const userModel = combinedUserModel(role);
       const user = await userModel.findOne({ refreshToken });
       if (user) {
