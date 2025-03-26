@@ -4,11 +4,8 @@ import asyncHandler from "express-async-handler";
 
 import { instructorAuthService as authService } from "../../services/instructorAuth.js";
 
-import Instructor, { IInstructor } from "../../models/instructorModel.js";
-import {
-  setRefreshTokenCookie,
-  clearRefreshTokenCookie,
-} from "../../utils/cookieUtils.js";
+import { IInstructor } from "../../models/instructorModel.js";
+import { setRefreshTokenCookie } from "../../utils/cookieUtils.js";
 import {
   InstructorLoginSchema,
   InstructorRegistrationSchema,
@@ -131,25 +128,3 @@ export const login = asyncHandler(
     }
   }
 );
-
-// Logout Handler
-export const logout = asyncHandler(async (req: Request, res: Response) => {
-  const refreshToken = req.cookies?.session;
-  if (!refreshToken) {
-    res.sendStatus(204);
-    return;
-  }
-
-  try {
-    const instructor = await Instructor.findOne({ refreshToken });
-    if (instructor) {
-      await authService.clearRefreshToken(instructor._id as string);
-    }
-
-    clearRefreshTokenCookie(res);
-    res.sendStatus(200);
-  } catch (error) {
-    console.error("Logout error:", error);
-    createErrorResponse(res, 500, "Internal server error");
-  }
-});

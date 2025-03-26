@@ -1,11 +1,9 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import { envConfig } from "../config/envValidator.js";
-import { JwtPayload, roleMappings } from "../controllers/refresh.js";
-import { Model } from "mongoose";
-import { IStudent } from "../models/studentModel.js";
-import { IInstructor } from "../models/instructorModel.js";
+import { JwtPayload } from "../controllers/refresh.js";
 import { redis } from "../config/redisConfig.js";
+import { combinedUserModel } from "../utils/roleMappings.js";
 
 const router = express.Router();
 
@@ -37,7 +35,7 @@ router.get("/auth/session", async (req, res) => {
       return;
     }
 
-    const userModel = roleMappings[role].model as Model<IStudent | IInstructor>;
+    const userModel = combinedUserModel(role);
     const user = await userModel
       .findById(id)
       .select(

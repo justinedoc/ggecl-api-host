@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
-import studentModel, { IStudent } from "../models/studentModel.js";
-import instructorModel, { IInstructor } from "../models/instructorModel.js";
+import { IStudent } from "../models/studentModel.js";
+import { IInstructor } from "../models/instructorModel.js";
 import { Model } from "mongoose";
 import { envConfig } from "../config/envValidator.js";
 import { generateToken } from "../utils/generateToken.js";
@@ -11,27 +11,15 @@ import {
   clearRefreshTokenCookie,
 } from "../utils/cookieUtils.js";
 import { redis } from "../config/redisConfig.js";
+import { roleMappings, UserRole } from "../utils/roleMappings.js";
 
-const REFRESH_CACHE_TTL = 14 * 60; // 14 minutes in seconds
-
-type UserRole = "student" | "instructor";
+const REFRESH_CACHE_TTL = 14 * 60;
 
 // JWT payload type
 export interface JwtPayload {
   id: string;
   role: UserRole;
 }
-
-// Role mapping with models for each role
-export type RoleConfig = {
-  student: { model: Model<IStudent> };
-  instructor: { model: Model<IInstructor> };
-};
-
-export const roleMappings: RoleConfig = {
-  student: { model: studentModel },
-  instructor: { model: instructorModel },
-};
 
 // Type guard for JWT payload
 const isJwtPayload = (decoded: unknown): decoded is JwtPayload => {

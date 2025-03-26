@@ -3,11 +3,8 @@ import { z } from "zod";
 import asyncHandler from "express-async-handler";
 
 import { studentAuthService } from "../../services/studentAuth.js";
-import StudentModel, { IStudent } from "../../models/studentModel.js";
-import {
-  setRefreshTokenCookie,
-  clearRefreshTokenCookie,
-} from "../../utils/cookieUtils.js";
+import { IStudent } from "../../models/studentModel.js";
+import { setRefreshTokenCookie } from "../../utils/cookieUtils.js";
 import {
   StudentLoginSchema,
   StudentRegistrationSchema,
@@ -123,28 +120,6 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       return;
     }
     console.error("Student login error:", error);
-    createErrorResponse(res, 500, "Internal server error");
-  }
-});
-
-// Logout Handler
-export const logout = asyncHandler(async (req: Request, res: Response) => {
-  const refreshToken = req.cookies?.session;
-  if (!refreshToken) {
-    res.sendStatus(204);
-    return;
-  }
-
-  try {
-    const student = await StudentModel.findOne({ refreshToken });
-    if (student) {
-      await studentAuthService.clearRefreshToken(student._id as string);
-    }
-
-    clearRefreshTokenCookie(res);
-    res.sendStatus(200);
-  } catch (error) {
-    console.error("Student logout error:", error);
     createErrorResponse(res, 500, "Internal server error");
   }
 });
