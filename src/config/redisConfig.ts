@@ -14,6 +14,10 @@ redis.on("error", (err) => {
 });
 
 export async function connectToCache() {
+  if (redis.isOpen) {
+    console.log("Redis is already connected.");
+    return;
+  }
   console.log("⚡ Connecting to cache...");
   try {
     await redis.connect();
