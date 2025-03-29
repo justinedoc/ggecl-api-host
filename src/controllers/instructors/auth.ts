@@ -20,7 +20,7 @@ import { emailService } from "../../services/emailService.js";
 // Common Response Formatters
 const formatAuthResponse = (instructor: IInstructor, accessToken: string) => ({
   instructor: {
-    _id: instructor._id,
+    instructorId: instructor._id,
     email: instructor.email,
     fullName: instructor.fullName,
   },
@@ -40,6 +40,7 @@ export const register = asyncHandler(
       const existingInstructor = await authService.findInstructorByEmail(
         validatedData.email
       );
+      
       if (existingInstructor) {
         return createErrorResponse(res, 409, "Email is already registered");
       }

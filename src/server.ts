@@ -47,16 +47,14 @@ app.use(`${ROUTE_PREFIX}/health-check`, (req, res) => {
 // Error handling middleware
 app.use(errorHandler);
 
-async function init() {
+export async function init() {
   try {
     await connectToDb();
     await connectToCache();
-    console.log("Database and Redis cache connected.");
+    console.log("✅ Database and Cache connected.");
   } catch (err) {
     console.error("Initialization error:", err);
   }
 }
-
-init();
 
 export default app;

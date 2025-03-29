@@ -19,10 +19,10 @@ redis.on("error", (err) => {
 });
 
 export async function connectToCache() {
-  console.log("⚡ Connecting to redis...");
+  console.log("⚡ Connecting to cache...");
   try {
     await redis.connect();
-    console.log("✅ Connected to Redis!");
+    console.log("✅ Connected to cache!");
   } catch (err) {
     console.error("❌ Redis connection error:", err);
     process.exit(1);
