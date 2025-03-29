@@ -1,9 +1,4 @@
 import { createClient } from "redis";
-// import { envConfig } from "./envValidator.js";
-
-// const redis = createClient({
-//   url: envConfig.redisUrl,
-// });
 
 export const redis = createClient({
   username: "default",
