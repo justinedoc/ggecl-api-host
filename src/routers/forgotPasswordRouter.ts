@@ -3,7 +3,7 @@ import { procedure, router } from "../trpc.js";
 import z from "zod";
 import { combinedUserModel } from "../utils/roleMappings.js";
 import { passwordServices } from "../services/passwordServices.js";
-import bycrpt from "bcrypt";
+import bcrypt from "bcrypt";
 import { SALT_ROUNDS } from "../constants/auth.js";
 
 const InitiateForgotPasswordSchema = z.object({
@@ -27,22 +27,22 @@ export const forgotPasswordRouter = router({
   initiate: procedure
     .input(InitiateForgotPasswordSchema)
     .query(async ({ input }) => {
+      const { email, role } = input;
+      const userModel = combinedUserModel(role);
+      const { initForgotPassword } = passwordServices(role);
+
+      const user = await userModel.findOne({ email }).lean();
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User was not found",
+        });
+      }
+
       try {
-        const userModel = combinedUserModel(input.role);
-        const { initForgotPassword } = passwordServices(input.role);
-
-        const user = await userModel.findOne({ email: input.email }).lean();
-
-        if (!user) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "User was not found",
-          });
-        }
-
         await initForgotPassword(user._id.toString());
       } catch (err) {
-        console.error("Error initiating forgot password: ", err);
+        console.error("Error initiating forgot password:", err);
         if (err instanceof TRPCError) throw err;
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -59,18 +59,16 @@ export const forgotPasswordRouter = router({
     .mutation(async ({ input }) => {
       const { token, password, role } = input;
       const { updatePassword } = passwordServices(role);
+      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-      const hashedPassword = await bycrpt.hash(password, SALT_ROUNDS);
       try {
         const result = await updatePassword(token, hashedPassword);
-
         if (!result.success) {
           throw new TRPCError({
             code: "UNAUTHORIZED",
             message: result.message,
           });
         }
-
         return result;
       } catch (err) {
         console.error(
@@ -79,6 +77,10 @@ export const forgotPasswordRouter = router({
           }`
         );
         if (err instanceof TRPCError) throw err;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred",
+        });
       }
     }),
 });

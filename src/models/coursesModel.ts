@@ -6,7 +6,7 @@ export interface ICourse extends Document {
   instructor: Types.ObjectId;
   description: string;
   certification: string;
-  syllabus: string[]; // Can be further detailed if needed
+  syllabus: string[]; 
   reviews: Review[];
   totalRating: number;
   totalStar: number;

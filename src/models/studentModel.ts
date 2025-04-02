@@ -1,4 +1,5 @@
 import { Document, Schema, model } from "mongoose";
+import { CartSchema, ICart } from "./cartSchema.js";
 
 interface IStudentNotification extends Document {
   title: string;
@@ -23,6 +24,7 @@ export interface IStudent extends Document {
   emailVerificationExpires?: Date;
   passwordUpdateToken?: string;
   passwordUpdateTokenExpiry?: Date;
+  cartItems: ICart[];
 }
 
 // Student Notification Schema
@@ -54,6 +56,7 @@ export const StudentSchema = new Schema<IStudent>(
     email: { type: String, required: true, unique: true },
     password: { type: String },
     notifications: { type: [StudentNotificationSchema], default: [] },
+    cartItems: { type: [CartSchema], default: [] },
     refreshToken: { type: String, select: false },
   },
   { timestamps: true }
