@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import compression from "compression";
-// import mongoose from "mongoose";
 
 // Controllers & Routes
 import refresh from "./controllers/refresh.js";
@@ -13,11 +12,15 @@ import verifyEmailRoutes from "./routes/emailVerifyRoutes.js";
 import sessionRoute from "./routes/sessionRoute.js";
 
 // Configs & Middlewares
-// import { envConfig } from "./config/envValidator.js";
-import { errorHandler } from "./middlewares/errorHandler.js";
+import { errorHandler } from "./middlewares-old/errorHandler.js";
 import { connectToCache } from "./config/redisConfig.js";
 import { connectToDb } from "./config/mongodbConfig.js";
 import logoutRoute from "./routes/logoutRoute.js";
+
+import { createContext } from "./context.js";
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { appRouter } from "./routers/appRouter.js";
+
 const app = express();
 
 // Middlewares
@@ -40,6 +43,15 @@ app.use(`${ROUTE_PREFIX}`, verifyEmailRoutes);
 app.use(`${ROUTE_PREFIX}/refresh`, refresh);
 app.use(ROUTE_PREFIX, sessionRoute);
 app.use(`${ROUTE_PREFIX}`, logoutRoute);
+
+app.use(
+  "/trpc",
+  createExpressMiddleware({
+    router: appRouter,
+    createContext,
+  })
+);
+
 app.use(`${ROUTE_PREFIX}/health-check`, (req, res) => {
   res.send("Server is running!");
 });

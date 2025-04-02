@@ -6,8 +6,8 @@ import {
   updateCourse,
   deleteCourse,
 } from "../controllers/course.js";
-import { authenticator } from "../middlewares/authenticator.js";
-import { isRole } from "../middlewares/isRole.js";
+import { authenticator } from "../middlewares-old/authenticator.js";
+import { isRole } from "../middlewares-old/isRole.js";
 
 const router = Router();
 

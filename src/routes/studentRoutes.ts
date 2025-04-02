@@ -4,9 +4,9 @@ import {
   getStudentById,
   updateStudent,
 } from "../controllers/students/index.js";
-import { authenticator } from "../middlewares/authenticator.js";
+import { authenticator } from "../middlewares-old/authenticator.js";
 import { handleStudentGoogleAuth } from "../controllers/students/googleAuth.js";
-import { checkObjectId } from "../middlewares/checkObjectId.js";
+import { checkObjectId } from "../middlewares-old/checkObjectId.js";
 
 const router = express.Router();
 

@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
-import { IStudent } from "../models/studentModel.js";
-import { IInstructor } from "../models/instructorModel.js";
-import { Model } from "mongoose";
 import { envConfig } from "../config/envValidator.js";
 import { generateToken } from "../utils/generateToken.js";
 import {
@@ -11,7 +8,7 @@ import {
   clearRefreshTokenCookie,
 } from "../utils/cookieUtils.js";
 import { redis } from "../config/redisConfig.js";
-import { roleMappings, UserRole } from "../utils/roleMappings.js";
+import { combinedUserModel, roleMappings, UserRole } from "../utils/roleMappings.js";
 
 const REFRESH_CACHE_TTL = 14 * 60;
 
@@ -83,7 +80,7 @@ const refresh = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id, role } = decoded;
-  const userModel = roleMappings[role].model as Model<IStudent | IInstructor>;
+  const userModel = combinedUserModel(role);
 
   // Find user with matching refresh token
   const user = await userModel.findById(id);

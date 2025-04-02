@@ -1,7 +1,7 @@
 // src/routes/authRoutes.ts
 import { Router } from "express";
 import { resendVerification, verifyEmail } from "../controllers/email.js";
-import { rateLimiter } from "../middlewares/security.js";
+import { rateLimiter } from "../middlewares-old/security.js";
 
 const router = Router();
 

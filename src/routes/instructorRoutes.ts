@@ -1,5 +1,5 @@
 import express from "express";
-import { authenticator } from "../middlewares/authenticator.js";
+import { authenticator } from "../middlewares-old/authenticator.js";
 import { register, login } from "../controllers/instructors/auth.js";
 
 import {
@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/login", login);
 
-router.post("/google/auth", handleGoogleAuth)
+router.post("/google/auth", handleGoogleAuth);
 
 router.put("/:id", authenticator, updateInstructor);
 
