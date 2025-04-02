@@ -10,10 +10,6 @@ export const InstructorRegistrationSchema = z.object({
       "Password must contain at least one uppercase letter, one lowercase letter, and one number"
     ),
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  dateOfBirth: z
-    .string()
-    .transform((str) => new Date(str))
-    .optional(),
   gender: z
     .enum(["male", "female", "other"], {
       errorMap: () => ({ message: "Invalid gender selection" }),

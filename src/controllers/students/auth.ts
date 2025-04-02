@@ -24,7 +24,6 @@ const formatAuthResponse = (student: IStudent, accessToken: string) => ({
     studentId: student._id,
     email: student.email,
     fullName: student.fullName,
-    dateOfBirth: student.dateOfBirth,
     gender: student.gender,
   },
   accessToken,

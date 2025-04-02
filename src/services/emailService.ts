@@ -1,14 +1,22 @@
-import { Model } from "mongoose";
-import crypto from "crypto";
-import Student, { IStudent } from "../models/studentModel.js";
-import Instructor, { IInstructor } from "../models/instructorModel.js";
 import { sendVerificationToEmail } from "./sendVerificationToEmail.js";
-import { envConfig } from "../config/envValidator.js";
 import { z } from "zod";
+import { combinedUserModel } from "../utils/roleMappings.js";
+import {
+  constructVerificationLink,
+  generateVerificationToken,
+} from "./verification.js";
+import { verifyEmailHtml } from "../constants/verifyEmailHtml.js";
+import {
+  VERIFY_EMAIL_SUBJECT,
+  VERIFY_EMAIL_TEXT,
+} from "../constants/messages.js";
 
 // Schemas for validation
 export const verifyEmailSchema = z.object({
-  token: z.string().length(128).regex(/^[a-f0-9]+$/i),
+  token: z
+    .string()
+    .length(128)
+    .regex(/^[a-f0-9]+$/i),
   role: z.enum(["student", "instructor"]),
 });
 
@@ -17,37 +25,11 @@ export const resendVerificationSchema = z.object({
   role: z.enum(["student", "instructor"]),
 });
 
-interface VerificationTokenPayload {
-  token: string;
-  expires: Date;
-}
-
-const TOKEN_EXPIRATION_MINUTES = 10;
-const TOKEN_BYTES = 40;
-
-type ModelMappingType = {
-  student: Model<IStudent>;
-  instructor: Model<IInstructor>;
-};
-
-const Models: ModelMappingType = {
-  student: Student,
-  instructor: Instructor,
-};
-
 // The role type
 type UserRole = "student" | "instructor";
 
 export const emailService = (role: UserRole) => {
-  const UserModel = Models[role] as Model<IStudent | IInstructor>;
-
-  const generateVerificationToken = (): VerificationTokenPayload => ({
-    token: crypto.randomBytes(TOKEN_BYTES).toString("hex"),
-    expires: new Date(Date.now() + TOKEN_EXPIRATION_MINUTES * 60 * 1000),
-  });
-
-  const constructVerificationLink = (token: string): string =>
-    `${envConfig.verifyEmailBaseUrl}?token=${token}`;
+  const UserModel = combinedUserModel(role);
 
   async function initiateEmailVerification(userId: string, email: string) {
     try {
@@ -66,10 +48,15 @@ export const emailService = (role: UserRole) => {
         throw new Error("User not found");
       }
 
+      const verificationLink = constructVerificationLink(token);
+
       const result = await sendVerificationToEmail({
-        username: user.fullName || user.email,
+        username: user.fullName,
         toEmail: email,
-        verificationLink: constructVerificationLink(token),
+        verificationLink,
+        html: verifyEmailHtml(user.fullName, verificationLink),
+        message: VERIFY_EMAIL_TEXT(verificationLink),
+        subject: VERIFY_EMAIL_SUBJECT,
       });
 
       return result;

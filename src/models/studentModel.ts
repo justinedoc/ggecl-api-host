@@ -9,7 +9,6 @@ interface IStudentNotification extends Document {
 
 export interface IStudent extends Document {
   fullName: string;
-  dateOfBirth?: Date;
   gender: string;
   picture: string;
   username?: string;
@@ -22,6 +21,8 @@ export interface IStudent extends Document {
   refreshToken?: string;
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
+  passwordUpdateToken?: string;
+  passwordUpdateTokenExpiry?: Date;
 }
 
 // Student Notification Schema
@@ -36,7 +37,6 @@ const StudentNotificationSchema = new Schema<IStudentNotification>({
 export const StudentSchema = new Schema<IStudent>(
   {
     fullName: { type: String, required: true },
-    dateOfBirth: { type: Date },
     gender: { type: String, default: "other" },
     picture: {
       type: String,
@@ -49,6 +49,8 @@ export const StudentSchema = new Schema<IStudent>(
     isVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String },
     emailVerificationExpires: { type: Date },
+    passwordUpdateToken: { type: String },
+    passwordUpdateTokenExpiry: { type: Date },
     email: { type: String, required: true, unique: true },
     password: { type: String },
     notifications: { type: [StudentNotificationSchema], default: [] },

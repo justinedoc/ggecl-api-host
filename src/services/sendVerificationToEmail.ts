@@ -1,28 +1,27 @@
 import { envConfig } from "../config/envValidator.js";
-import {
-  VERIFY_EMAIL_SUBJECT,
-  VERIFY_EMAIL_TEXT,
-} from "../constants/messages.js";
-import { verifyEmailHtml } from "../constants/verifyEmailHtml.js";
 import { transporter } from "./mailer.js";
 
 interface SendVerificationToEmailParams {
   toEmail: string;
   username: string;
   verificationLink: string;
+  html?: string;
+  message: string;
+  subject: string;
 }
 
 export async function sendVerificationToEmail({
-  username,
   toEmail,
-  verificationLink,
+  html,
+  message,
+  subject,
 }: SendVerificationToEmailParams) {
   const mailOptions = {
     from: envConfig.emailAddr,
     to: toEmail,
-    subject: VERIFY_EMAIL_SUBJECT,
-    html: verifyEmailHtml(username, verificationLink),
-    text: VERIFY_EMAIL_TEXT(verificationLink),
+    subject,
+    html,
+    text: message,
   };
 
   try {

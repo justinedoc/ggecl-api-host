@@ -12,7 +12,6 @@ interface IInstructorNotification extends Document {
 // Main Instructor interface
 export interface IInstructor extends Document {
   fullName: string;
-  dateOfBirth?: Date;
   gender: string;
   picture: string;
   username: string;
@@ -25,6 +24,8 @@ export interface IInstructor extends Document {
   refreshToken?: string;
   emailVerificationToken?: string;
   emailVerificationExpires?: Date;
+  passwordUpdateToken?: string;
+  passwordUpdateTokenExpiry?: Date;
   reviews: Review[];
   students: Types.ObjectId[];
   courses: Types.ObjectId[];
@@ -44,7 +45,6 @@ const InstructorNotificationSchema = new Schema<IInstructorNotification>({
 export const InstructorSchema = new Schema<IInstructor>(
   {
     fullName: { type: String, required: true },
-    dateOfBirth: { type: Date },
     gender: { type: String, default: "other" },
     picture: {
       type: String,
@@ -56,6 +56,8 @@ export const InstructorSchema = new Schema<IInstructor>(
     emailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String },
     emailVerificationExpires: { type: Date },
+    passwordUpdateToken: { type: String },
+    passwordUpdateTokenExpiry: { type: Date },
     isVerified: { type: Boolean, default: false },
     email: { type: String, required: true, unique: true },
     password: { type: String },
